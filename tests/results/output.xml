@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.4.1 (Python 3.9.6 on darwin)" generated="2025-12-26T14:41:08.029228" rpa="false" schemaversion="5">
+<suite id="s1" name="Suites" source="/Users/myitam3021/fandly-portofolio-2025/inventory-backend/tests/robot/suites">
+<suite id="s1-s1" name="Sales Suites" source="/Users/myitam3021/fandly-portofolio-2025/inventory-backend/tests/robot/suites/sales_suites.robot">
+<kw name="Setup API Session" owner="auth_keywords" type="SETUP">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2025-12-26T14:41:08.102038" level="INFO">Creating Session using : alias=inventory, url=http://127.0.0.1:8000/api/v1, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=True,                     debug=0 </msg>
+<arg>inventory</arg>
+<arg>${BASE_URL}</arg>
+<arg>verify=True</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2025-12-26T14:41:08.101841" elapsed="0.000349"/>
+</kw>
+<status status="PASS" start="2025-12-26T14:41:08.101448" elapsed="0.000846"/>
+</kw>
+<test id="s1-s1-t1" name="User Should Be Able To Checkout Successfully" line="11">
+<kw name="Given Login with PASETO TOKEN">
+<kw name="Get Auth Token" owner="auth_keywords">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.103584" level="INFO">${auth_data} = {'username': 'fanfanmyid', 'password': 'Sample123!'}</msg>
+<var>${auth_data}</var>
+<arg>username=${username}</arg>
+<arg>password=${password}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.103252" elapsed="0.000351"/>
+</kw>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2025-12-26T14:41:08.367212" level="INFO">POST Request : url=http://127.0.0.1:8000/api/v1/auth/login 
+ path_url=/api/v1/auth/login 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '41', 'Content-Type': 'application/x-www-form-urlencoded'} 
+ body=username=fanfanmyid&amp;password=Sample123%21 
+ </msg>
+<msg time="2025-12-26T14:41:08.367298" level="INFO">POST Response : url=http://127.0.0.1:8000/api/v1/auth/login 
+ status=200, reason=OK 
+ headers={'date': 'Fri, 26 Dec 2025 07:41:07 GMT', 'server': 'uvicorn', 'content-length': '221', 'content-type': 'application/json'} 
+ body={"access_token":"v4.local.XQpC5bNaUKOLUkXnwYOU8eitBWVAx4WWoTq3kXJmJ_TAoQ2eCbLMjIFpG8j36K7tAOam4ZbFwKrkncsfmJUGVsJ6tis455eZxRQ1Uf_qo0tYW59PGXcu_R0A-dgfbKgBy2gs3YekiQsCfvleMhh0GE4BKvDCkD9guliU_rfAX08","token_type":"bearer"} 
+ </msg>
+<msg time="2025-12-26T14:41:08.367415" level="INFO">${resp} = &lt;Response [200]&gt;</msg>
+<var>${resp}</var>
+<arg>inventory</arg>
+<arg>/auth/login</arg>
+<arg>data=${auth_data}</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.103673" elapsed="0.263758"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${resp}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.367560" elapsed="0.000168"/>
+</kw>
+<kw name="Get From Dictionary" owner="Collections">
+<msg time="2025-12-26T14:41:08.368134" level="INFO">${token} = v4.local.XQpC5bNaUKOLUkXnwYOU8eitBWVAx4WWoTq3kXJmJ_TAoQ2eCbLMjIFpG8j36K7tAOam4ZbFwKrkncsfmJUGVsJ6tis455eZxRQ1Uf_qo0tYW59PGXcu_R0A-dgfbKgBy2gs3YekiQsCfvleMhh0GE4BKvDCkD9guliU_rfAX08</msg>
+<var>${token}</var>
+<arg>${resp.json()}</arg>
+<arg>access_token</arg>
+<doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.367790" elapsed="0.000359"/>
+</kw>
+<return>
+<value>${token}</value>
+<status status="PASS" start="2025-12-26T14:41:08.368180" elapsed="0.000028"/>
+</return>
+<msg time="2025-12-26T14:41:08.368284" level="INFO">${token} = v4.local.XQpC5bNaUKOLUkXnwYOU8eitBWVAx4WWoTq3kXJmJ_TAoQ2eCbLMjIFpG8j36K7tAOam4ZbFwKrkncsfmJUGVsJ6tis455eZxRQ1Uf_qo0tYW59PGXcu_R0A-dgfbKgBy2gs3YekiQsCfvleMhh0GE4BKvDCkD9guliU_rfAX08</msg>
+<var>${token}</var>
+<arg>${username}</arg>
+<arg>${password}</arg>
+<status status="PASS" start="2025-12-26T14:41:08.103011" elapsed="0.265285"/>
+</kw>
+<kw name="Set Test Variable" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.368559" level="INFO">${token} = v4.local.XQpC5bNaUKOLUkXnwYOU8eitBWVAx4WWoTq3kXJmJ_TAoQ2eCbLMjIFpG8j36K7tAOam4ZbFwKrkncsfmJUGVsJ6tis455eZxRQ1Uf_qo0tYW59PGXcu_R0A-dgfbKgBy2gs3YekiQsCfvleMhh0GE4BKvDCkD9guliU_rfAX08</msg>
+<arg>${token}</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.368362" elapsed="0.000220"/>
+</kw>
+<arg>${USERNAME}</arg>
+<arg>${PASSWORD}</arg>
+<status status="PASS" start="2025-12-26T14:41:08.102739" elapsed="0.265873"/>
+</kw>
+<kw name="When Initial Body Request">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.369097" level="INFO">${headers} = {'Authorization': 'Bearer v4.local.XQpC5bNaUKOLUkXnwYOU8eitBWVAx4WWoTq3kXJmJ_TAoQ2eCbLMjIFpG8j36K7tAOam4ZbFwKrkncsfmJUGVsJ6tis455eZxRQ1Uf_qo0tYW59PGXcu_R0A-dgfbKgBy2gs3YekiQsCfvleMhh0GE4BKvDCkD9guliU_...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${token}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.368906" elapsed="0.000206"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2025-12-26T14:41:08.454905" level="INFO">GET Request : url=http://127.0.0.1:8000/api/v1/products/1 
+ path_url=/api/v1/products/1 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer v4.local.XQpC5bNaUKOLUkXnwYOU8eitBWVAx4WWoTq3kXJmJ_TAoQ2eCbLMjIFpG8j36K7tAOam4ZbFwKrkncsfmJUGVsJ6tis455eZxRQ1Uf_qo0tYW59PGXcu_R0A-dgfbKgBy2gs3YekiQsCfvleMhh0GE4BKvDCkD9guliU_rfAX08'} 
+ body=None 
+ </msg>
+<msg time="2025-12-26T14:41:08.454968" level="INFO">GET Response : url=http://127.0.0.1:8000/api/v1/products/1 
+ status=200, reason=OK 
+ headers={'date': 'Fri, 26 Dec 2025 07:41:07 GMT', 'server': 'uvicorn', 'content-length': '101', 'content-type': 'application/json'} 
+ body={"sku":"EL-001","name":"Samsung Smart TV 4k","description":"TV","price":10000000.0,"stock":46,"id":1} 
+ </msg>
+<msg time="2025-12-26T14:41:08.455054" level="INFO">${resp} = &lt;Response [200]&gt;</msg>
+<var>${resp}</var>
+<arg>inventory</arg>
+<arg>/products/1</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.369167" elapsed="0.085902"/>
+</kw>
+<kw name="Convert To Integer" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.455656" level="INFO">${initial_stock} = 46</msg>
+<var>${initial_stock}</var>
+<arg>${resp.json()}[stock]</arg>
+<doc>Converts the given item to an integer number.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.455186" elapsed="0.000486"/>
+</kw>
+<kw name="Set Test Variable" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.455913" level="INFO">${initial_stock} = 46</msg>
+<arg>${initial_stock}</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.455740" elapsed="0.000196"/>
+</kw>
+<kw name="Set Test Variable" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.456148" level="INFO">${headers} = {'Authorization': 'Bearer v4.local.XQpC5bNaUKOLUkXnwYOU8eitBWVAx4WWoTq3kXJmJ_TAoQ2eCbLMjIFpG8j36K7tAOam4ZbFwKrkncsfmJUGVsJ6tis455eZxRQ1Uf_qo0tYW59PGXcu_R0A-dgfbKgBy2gs3YekiQsCfvleMhh0GE4BKvDCkD9guliU_...</msg>
+<arg>${headers}</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.455993" elapsed="0.000178"/>
+</kw>
+<status status="PASS" start="2025-12-26T14:41:08.368765" elapsed="0.087441"/>
+</kw>
+<kw name="And Hit Api sales">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.456684" level="INFO">${item} = {'product_id': '1', 'quantity': '2'}</msg>
+<var>${item}</var>
+<arg>product_id=1</arg>
+<arg>quantity=2</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.456521" elapsed="0.000241"/>
+</kw>
+<kw name="Create List" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.456966" level="INFO">${items} = [{'product_id': '1', 'quantity': '2'}]</msg>
+<var>${items}</var>
+<arg>${item}</arg>
+<doc>Returns a list containing given items.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.456821" elapsed="0.000159"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.457215" level="INFO">${payload} = {'items': [{'product_id': '1', 'quantity': '2'}]}</msg>
+<var>${payload}</var>
+<arg>items=${items}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.457038" elapsed="0.000190"/>
+</kw>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2025-12-26T14:41:08.562806" level="INFO">POST Request : url=http://127.0.0.1:8000/api/v1/sales/ 
+ path_url=/api/v1/sales/ 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer v4.local.XQpC5bNaUKOLUkXnwYOU8eitBWVAx4WWoTq3kXJmJ_TAoQ2eCbLMjIFpG8j36K7tAOam4ZbFwKrkncsfmJUGVsJ6tis455eZxRQ1Uf_qo0tYW59PGXcu_R0A-dgfbKgBy2gs3YekiQsCfvleMhh0GE4BKvDCkD9guliU_rfAX08', 'Content-Length': '49', 'Content-Type': 'application/json'} 
+ body=b'{"items": [{"product_id": "1", "quantity": "2"}]}' 
+ </msg>
+<msg time="2025-12-26T14:41:08.562873" level="INFO">POST Response : url=http://127.0.0.1:8000/api/v1/sales/ 
+ status=200, reason=OK 
+ headers={'date': 'Fri, 26 Dec 2025 07:41:07 GMT', 'server': 'uvicorn', 'content-length': '121', 'content-type': 'application/json'} 
+ body={"id":10,"invoice_number":"INV-A3B75BF4","total_price":20000000.0,"user_id":2,"created_at":"2025-12-26T07:41:08.847337Z"} 
+ </msg>
+<msg time="2025-12-26T14:41:08.562982" level="INFO">${resp} = &lt;Response [200]&gt;</msg>
+<var>${resp}</var>
+<arg>inventory</arg>
+<arg>/sales/</arg>
+<arg>json=${payload}</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.457284" elapsed="0.105720"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${resp}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.563128" elapsed="0.000155"/>
+</kw>
+<status status="PASS" start="2025-12-26T14:41:08.456347" elapsed="0.106981"/>
+</kw>
+<kw name="Then Verify Data and Stock Reduction">
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2025-12-26T14:41:08.581289" level="INFO">GET Request : url=http://127.0.0.1:8000/api/v1/products/1 
+ path_url=/api/v1/products/1 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer v4.local.XQpC5bNaUKOLUkXnwYOU8eitBWVAx4WWoTq3kXJmJ_TAoQ2eCbLMjIFpG8j36K7tAOam4ZbFwKrkncsfmJUGVsJ6tis455eZxRQ1Uf_qo0tYW59PGXcu_R0A-dgfbKgBy2gs3YekiQsCfvleMhh0GE4BKvDCkD9guliU_rfAX08'} 
+ body=None 
+ </msg>
+<msg time="2025-12-26T14:41:08.581354" level="INFO">GET Response : url=http://127.0.0.1:8000/api/v1/products/1 
+ status=200, reason=OK 
+ headers={'date': 'Fri, 26 Dec 2025 07:41:07 GMT', 'server': 'uvicorn', 'content-length': '101', 'content-type': 'application/json'} 
+ body={"sku":"EL-001","name":"Samsung Smart TV 4k","description":"TV","price":10000000.0,"stock":44,"id":1} 
+ </msg>
+<msg time="2025-12-26T14:41:08.581451" level="INFO">${resp} = &lt;Response [200]&gt;</msg>
+<var>${resp}</var>
+<arg>inventory</arg>
+<arg>/products/1</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.563740" elapsed="0.017729"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.582082" level="INFO">${new_stock} = 44</msg>
+<var>${new_stock}</var>
+<arg>${resp.json()['stock']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.581586" elapsed="0.000514"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.582432" level="INFO">${expected_stock} = 44</msg>
+<var>${expected_stock}</var>
+<arg>int(${initial_stock})-2</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.582177" elapsed="0.000272"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${new_stock}</arg>
+<arg>${expected_stock}</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.582517" elapsed="0.000189"/>
+</kw>
+<status status="PASS" start="2025-12-26T14:41:08.563529" elapsed="0.019224"/>
+</kw>
+<doc>E2E flow for purchasing a product.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.102345" elapsed="0.480515"/>
+</test>
+<status status="PASS" start="2025-12-26T14:41:08.047198" elapsed="0.535946"/>
+</suite>
+<suite id="s1-s2" name="Test Sales Bdd" source="/Users/myitam3021/fandly-portofolio-2025/inventory-backend/tests/robot/suites/test_sales_bdd.robot">
+<kw name="Setup API Session" owner="auth_keywords" type="SETUP">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2025-12-26T14:41:08.585697" level="INFO">Creating Session using : alias=inventory, url=http://127.0.0.1:8000/api/v1, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=True,                     debug=0 </msg>
+<arg>inventory</arg>
+<arg>${BASE_URL}</arg>
+<arg>verify=True</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2025-12-26T14:41:08.585541" elapsed="0.000296"/>
+</kw>
+<status status="PASS" start="2025-12-26T14:41:08.585383" elapsed="0.000508"/>
+</kw>
+<test id="s1-s2-t1" name="Scenario: User performs a checkout with dynamic stock verification" line="13">
+<kw name="Given I am a logged in user">
+<kw name="Get Auth Token" owner="auth_keywords">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.587213" level="INFO">${auth_data} = {'username': 'fanfanmyid', 'password': 'Sample123!'}</msg>
+<var>${auth_data}</var>
+<arg>username=${username}</arg>
+<arg>password=${password}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.586955" elapsed="0.000276"/>
+</kw>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2025-12-26T14:41:08.843621" level="INFO">POST Request : url=http://127.0.0.1:8000/api/v1/auth/login 
+ path_url=/api/v1/auth/login 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '41', 'Content-Type': 'application/x-www-form-urlencoded'} 
+ body=username=fanfanmyid&amp;password=Sample123%21 
+ </msg>
+<msg time="2025-12-26T14:41:08.843701" level="INFO">POST Response : url=http://127.0.0.1:8000/api/v1/auth/login 
+ status=200, reason=OK 
+ headers={'date': 'Fri, 26 Dec 2025 07:41:07 GMT', 'server': 'uvicorn', 'content-length': '221', 'content-type': 'application/json'} 
+ body={"access_token":"v4.local.txqeA_tpPiAPd6PlTzwAjN47x0Aur7ifSglLEm12nvKI7CfYgxBbVRWTAuutrytMIqiNSj7i-q0UbZmnOfpRU3MHmTRgaUejCT8HqByUuMjXODSgP7jif0N7bJiqBdM9yjmDd90qdwGRymgXKk5iuibpRWKRLL-p4iuHDjejkVk","token_type":"bearer"} 
+ </msg>
+<msg time="2025-12-26T14:41:08.843816" level="INFO">${resp} = &lt;Response [200]&gt;</msg>
+<var>${resp}</var>
+<arg>inventory</arg>
+<arg>/auth/login</arg>
+<arg>data=${auth_data}</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.587307" elapsed="0.256525"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${resp}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.843985" elapsed="0.000141"/>
+</kw>
+<kw name="Get From Dictionary" owner="Collections">
+<msg time="2025-12-26T14:41:08.844584" level="INFO">${token} = v4.local.txqeA_tpPiAPd6PlTzwAjN47x0Aur7ifSglLEm12nvKI7CfYgxBbVRWTAuutrytMIqiNSj7i-q0UbZmnOfpRU3MHmTRgaUejCT8HqByUuMjXODSgP7jif0N7bJiqBdM9yjmDd90qdwGRymgXKk5iuibpRWKRLL-p4iuHDjejkVk</msg>
+<var>${token}</var>
+<arg>${resp.json()}</arg>
+<arg>access_token</arg>
+<doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.844248" elapsed="0.000352"/>
+</kw>
+<return>
+<value>${token}</value>
+<status status="PASS" start="2025-12-26T14:41:08.844631" elapsed="0.000023"/>
+</return>
+<msg time="2025-12-26T14:41:08.844726" level="INFO">${token} = v4.local.txqeA_tpPiAPd6PlTzwAjN47x0Aur7ifSglLEm12nvKI7CfYgxBbVRWTAuutrytMIqiNSj7i-q0UbZmnOfpRU3MHmTRgaUejCT8HqByUuMjXODSgP7jif0N7bJiqBdM9yjmDd90qdwGRymgXKk5iuibpRWKRLL-p4iuHDjejkVk</msg>
+<var>${token}</var>
+<arg>${USERNAME}</arg>
+<arg>${PASSWORD}</arg>
+<status status="PASS" start="2025-12-26T14:41:08.586604" elapsed="0.258135"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.845033" level="INFO">${headers} = {'Authorization': 'Bearer v4.local.txqeA_tpPiAPd6PlTzwAjN47x0Aur7ifSglLEm12nvKI7CfYgxBbVRWTAuutrytMIqiNSj7i-q0UbZmnOfpRU3MHmTRgaUejCT8HqByUuMjXODSgP7jif0N7bJiqBdM9yjmDd90qdwGRymgXKk5iuibpRWKRLL-p4iuHD...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${token}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.844807" elapsed="0.000241"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.845295" level="INFO">${HEADERS} = {'Authorization': 'Bearer v4.local.txqeA_tpPiAPd6PlTzwAjN47x0Aur7ifSglLEm12nvKI7CfYgxBbVRWTAuutrytMIqiNSj7i-q0UbZmnOfpRU3MHmTRgaUejCT8HqByUuMjXODSgP7jif0N7bJiqBdM9yjmDd90qdwGRymgXKk5iuibpRWKRLL-p4iuHD...</msg>
+<arg>${HEADERS}</arg>
+<arg>${headers}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.845113" elapsed="0.000205"/>
+</kw>
+<status status="PASS" start="2025-12-26T14:41:08.586215" elapsed="0.259134"/>
+</kw>
+<kw name="And I have a product with ID &quot;1&quot;" source_name="I have a product with ID &quot;${id}&quot;">
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2025-12-26T14:41:08.866499" level="INFO">GET Request : url=http://127.0.0.1:8000/api/v1/products/1 
+ path_url=/api/v1/products/1 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer v4.local.txqeA_tpPiAPd6PlTzwAjN47x0Aur7ifSglLEm12nvKI7CfYgxBbVRWTAuutrytMIqiNSj7i-q0UbZmnOfpRU3MHmTRgaUejCT8HqByUuMjXODSgP7jif0N7bJiqBdM9yjmDd90qdwGRymgXKk5iuibpRWKRLL-p4iuHDjejkVk'} 
+ body=None 
+ </msg>
+<msg time="2025-12-26T14:41:08.866562" level="INFO">GET Response : url=http://127.0.0.1:8000/api/v1/products/1 
+ status=200, reason=OK 
+ headers={'date': 'Fri, 26 Dec 2025 07:41:07 GMT', 'server': 'uvicorn', 'content-length': '101', 'content-type': 'application/json'} 
+ body={"sku":"EL-001","name":"Samsung Smart TV 4k","description":"TV","price":10000000.0,"stock":44,"id":1} 
+ </msg>
+<msg time="2025-12-26T14:41:08.866651" level="INFO">${resp} = &lt;Response [200]&gt;</msg>
+<var>${resp}</var>
+<arg>inventory</arg>
+<arg>/products/${id}</arg>
+<arg>headers=${HEADERS}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.845642" elapsed="0.021026"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${resp}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.866825" elapsed="0.000152"/>
+</kw>
+<kw name="Convert To Integer" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.867646" level="INFO">${current_actual_stock} = 44</msg>
+<var>${current_actual_stock}</var>
+<arg>${resp.json()['stock']}</arg>
+<doc>Converts the given item to an integer number.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.867060" elapsed="0.000609"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.867989" level="INFO">${PRODUCT_ID} = 1</msg>
+<arg>${PRODUCT_ID}</arg>
+<arg>${id}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.867773" elapsed="0.000239"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.868253" level="INFO">${START_STOCK} = 44</msg>
+<arg>${START_STOCK}</arg>
+<arg>${current_actual_stock}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.868079" elapsed="0.000196"/>
+</kw>
+<status status="PASS" start="2025-12-26T14:41:08.845496" elapsed="0.022817"/>
+</kw>
+<kw name="When I checkout &quot;2&quot; units of that product" source_name="I checkout &quot;${quantity}&quot; units of that product">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.868887" level="INFO">${item} = {'product_id': '1', 'quantity': '2'}</msg>
+<var>${item}</var>
+<arg>product_id=${PRODUCT_ID}</arg>
+<arg>quantity=${quantity}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.868627" elapsed="0.000274"/>
+</kw>
+<kw name="Create List" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.869119" level="INFO">${items} = [{'product_id': '1', 'quantity': '2'}]</msg>
+<var>${items}</var>
+<arg>${item}</arg>
+<doc>Returns a list containing given items.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.868968" elapsed="0.000165"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.869361" level="INFO">${payload} = {'items': [{'product_id': '1', 'quantity': '2'}]}</msg>
+<var>${payload}</var>
+<arg>items=${items}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.869194" elapsed="0.000180"/>
+</kw>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2025-12-26T14:41:08.953427" level="INFO">POST Request : url=http://127.0.0.1:8000/api/v1/sales/ 
+ path_url=/api/v1/sales/ 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer v4.local.txqeA_tpPiAPd6PlTzwAjN47x0Aur7ifSglLEm12nvKI7CfYgxBbVRWTAuutrytMIqiNSj7i-q0UbZmnOfpRU3MHmTRgaUejCT8HqByUuMjXODSgP7jif0N7bJiqBdM9yjmDd90qdwGRymgXKk5iuibpRWKRLL-p4iuHDjejkVk', 'Content-Length': '49', 'Content-Type': 'application/json'} 
+ body=b'{"items": [{"product_id": "1", "quantity": "2"}]}' 
+ </msg>
+<msg time="2025-12-26T14:41:08.953489" level="INFO">POST Response : url=http://127.0.0.1:8000/api/v1/sales/ 
+ status=200, reason=OK 
+ headers={'date': 'Fri, 26 Dec 2025 07:41:07 GMT', 'server': 'uvicorn', 'content-length': '121', 'content-type': 'application/json'} 
+ body={"id":11,"invoice_number":"INV-2F17C433","total_price":20000000.0,"user_id":2,"created_at":"2025-12-26T07:41:09.258234Z"} 
+ </msg>
+<msg time="2025-12-26T14:41:08.953576" level="INFO">${resp} = &lt;Response [200]&gt;</msg>
+<var>${resp}</var>
+<arg>inventory</arg>
+<arg>/sales/</arg>
+<arg>json=${payload}</arg>
+<arg>headers=${HEADERS}</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.869444" elapsed="0.084148"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.953974" level="INFO">${QTY_SOLD} = 2</msg>
+<arg>${QTY_SOLD}</arg>
+<arg>${quantity}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.953728" elapsed="0.000270"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.954236" level="INFO">${LAST_RESP} = &lt;Response [200]&gt;</msg>
+<arg>${LAST_RESP}</arg>
+<arg>${resp}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.954067" elapsed="0.000226"/>
+</kw>
+<status status="PASS" start="2025-12-26T14:41:08.868466" elapsed="0.085866"/>
+</kw>
+<kw name="Then the checkout should be successful">
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${LAST_RESP}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.954641" elapsed="0.000118"/>
+</kw>
+<status status="PASS" start="2025-12-26T14:41:08.954476" elapsed="0.000320"/>
+</kw>
+<kw name="And the product stock should be updated correctly">
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2025-12-26T14:41:08.976812" level="INFO">GET Request : url=http://127.0.0.1:8000/api/v1/products/1 
+ path_url=/api/v1/products/1 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer v4.local.txqeA_tpPiAPd6PlTzwAjN47x0Aur7ifSglLEm12nvKI7CfYgxBbVRWTAuutrytMIqiNSj7i-q0UbZmnOfpRU3MHmTRgaUejCT8HqByUuMjXODSgP7jif0N7bJiqBdM9yjmDd90qdwGRymgXKk5iuibpRWKRLL-p4iuHDjejkVk'} 
+ body=None 
+ </msg>
+<msg time="2025-12-26T14:41:08.976869" level="INFO">GET Response : url=http://127.0.0.1:8000/api/v1/products/1 
+ status=200, reason=OK 
+ headers={'date': 'Fri, 26 Dec 2025 07:41:08 GMT', 'server': 'uvicorn', 'content-length': '101', 'content-type': 'application/json'} 
+ body={"sku":"EL-001","name":"Samsung Smart TV 4k","description":"TV","price":10000000.0,"stock":42,"id":1} 
+ </msg>
+<msg time="2025-12-26T14:41:08.976956" level="INFO">${resp} = &lt;Response [200]&gt;</msg>
+<var>${resp}</var>
+<arg>inventory</arg>
+<arg>/products/${PRODUCT_ID}</arg>
+<arg>headers=${HEADERS}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.955027" elapsed="0.021945"/>
+</kw>
+<kw name="Convert To Integer" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.978220" level="INFO">${final_stock} = 42</msg>
+<var>${final_stock}</var>
+<arg>${resp.json()['stock']}</arg>
+<doc>Converts the given item to an integer number.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.977092" elapsed="0.001147"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2025-12-26T14:41:08.978528" level="INFO">${expected} = 42</msg>
+<var>${expected}</var>
+<arg>${START_STOCK} - ${QTY_SOLD}</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.978317" elapsed="0.000226"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${final_stock}</arg>
+<arg>${expected}</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2025-12-26T14:41:08.978608" elapsed="0.000171"/>
+</kw>
+<status status="PASS" start="2025-12-26T14:41:08.954902" elapsed="0.023918"/>
+</kw>
+<status status="PASS" start="2025-12-26T14:41:08.585930" elapsed="0.392985"/>
+</test>
+<status status="PASS" start="2025-12-26T14:41:08.583422" elapsed="0.395654"/>
+</suite>
+<status status="PASS" start="2025-12-26T14:41:08.030031" elapsed="0.949312"/>
+</suite>
+<statistics>
+<total>
+<stat pass="2" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="Suites" id="s1" pass="2" fail="0" skip="0">Suites</stat>
+<stat name="Sales Suites" id="s1-s1" pass="1" fail="0" skip="0">Suites.Sales Suites</stat>
+<stat name="Test Sales Bdd" id="s1-s2" pass="1" fail="0" skip="0">Suites.Test Sales Bdd</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
