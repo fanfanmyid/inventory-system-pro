@@ -1,29 +1,45 @@
 import { defineStore } from 'pinia';
-import api from '@/api'; // Your axios instance with the interceptor
+import api from '@/api';
 
 export const useInventoryStore = defineStore('inventory', {
   state: () => ({
-    products: [],
-    loading: false,
+    transactions: [],
+    pagination: {
+      total: 0,
+      pages: 0,
+      currentPage: 1
+    },
+    loading: false
   }),
+
   actions: {
-    async fetchProducts() {
+    async fetchTransactions(params = {}) {
       this.loading = true;
       try {
-        const response = await api.get('/products/'); // Matches your FastAPI endpoint
-        this.products = response.data;
+        // params will include product_name, start_date, end_date, page, size
+        const response = await api.get('/transactions/', { params });
+        
+        // Match the structure we built in the backend
+        this.transactions = response.data.items;
+        this.pagination = {
+          total: response.data.total,
+          pages: response.data.pages,
+          currentPage: response.data.page
+        };
       } catch (error) {
-        console.error("Failed to fetch products:", error);
+        console.error("Error fetching transactions:", error);
       } finally {
         this.loading = false;
       }
     },
-    async fetchTransactions() {
+    async fetchProducts() {
         try {
-          const response = await api.get('/transactions/');
-          this.transactions = response.data;
+          const response = await api.get('/products/');
+          // Ensure you are assigning the data correctly
+          this.products = response.data; 
         } catch (error) {
-          console.error("Failed to fetch history:", error);
+          console.error("Products error:", error);
+          this.products = []; // Keep it as an array to avoid .length errors
         }
       }
   }

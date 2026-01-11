@@ -1,23 +1,21 @@
 <template>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-    <div class="container">
+      <div class="container">
         <a class="navbar-brand" href="#" id="brand-logo"><i class="bi bi-box-seam me-2"></i>Inventory Pro</a>
-        
         <div class="collapse navbar-collapse">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-            <router-link to="/dashboard" class="nav-link" id="nav-inventory">Inventory</router-link>
+              <router-link to="/dashboard" class="nav-link active" id="nav-inventory">Inventory</router-link>
             </li>
             <li class="nav-item">
-            <router-link to="/sales" class="nav-link" id="nav-sales">Sales</router-link>
+              <router-link to="/sales" class="nav-link" id="nav-sales">Sales</router-link>
             </li>
-        </ul>
+          </ul>
         </div>
-
         <button @click="logout" class="btn btn-outline-light btn-sm" id="btn-logout">
-        <i class="bi bi-box-arrow-right me-2"></i>Logout
+          <i class="bi bi-box-arrow-right me-2"></i>Logout
         </button>
-    </div>
+      </div>
     </nav>
   
     <div class="container">
@@ -26,22 +24,17 @@
         <button class="btn btn-success" id="btn-add-product"><i class="bi bi-plus-circle me-2"></i>Add Product</button>
       </div>
   
-      <div class="card shadow-sm">
-        <div v-if="successMessage" class="alert alert-success alert-dismissible fade show shadow-sm m-3" id="msg-success-tx" role="alert">
-          <i class="bi bi-check-circle-fill me-2"></i>
-          <strong>Success!</strong> {{ successMessage }}
-          <button type="button" class="btn-close" @click="successMessage = ''" aria-label="Close"></button>
+      <div class="card shadow-sm mb-5">
+        <div v-if="successMessage" class="alert alert-success alert-dismissible fade show m-3" id="msg-success-tx">
+          <i class="bi bi-check-circle-fill me-2"></i><strong>Success!</strong> {{ successMessage }}
+          <button type="button" class="btn-close" @click="successMessage = ''"></button>
         </div>
   
         <div class="table-responsive">
           <table class="table table-hover align-middle mb-0" id="table-inventory">
             <thead class="table-light">
               <tr>
-                <th>ID</th>
-                <th>Product Name</th>
-                <th>SKU</th>
-                <th>Stock</th>
-                <th class="text-center">Actions</th>
+                <th>ID</th><th>Product Name</th><th>SKU</th><th>Stock</th><th class="text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -55,13 +48,7 @@
                   </span>
                 </td>
                 <td class="text-center">
-                  <button 
-                    class="btn btn-sm btn-info text-white" 
-                    :id="`btn-update-stock-${product.id}`"
-                    data-bs-toggle="modal" 
-                    data-bs-target="#transactionModal"
-                    @click="prepareTransaction(product)"
-                  >
+                  <button class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="#transactionModal" @click="prepareTransaction(product)">
                     <i class="bi bi-arrow-left-right"></i> Update Stock
                   </button>
                 </td>
@@ -74,9 +61,34 @@
       <div class="mt-5 mb-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h2><i class="bi bi-clock-history me-2"></i>Transaction History</h2>
-          <button class="btn btn-outline-secondary btn-sm" id="btn-refresh-history" @click="inventory.fetchTransactions">
-            <i class="bi bi-arrow-clockwise"></i> Refresh
-          </button>
+          <div class="btn-group">
+            <button class="btn btn-outline-secondary btn-sm" @click="resetFilters" id="btn-reset-filters">
+              <i class="bi bi-x-circle me-1"></i>Reset
+            </button>
+            <button class="btn btn-outline-primary btn-sm" @click="handleFilter" id="btn-refresh-history">
+              <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+            </button>
+          </div>
+        </div>
+  
+        <div class="card shadow-sm border-0 mb-3 p-3 bg-light">
+          <div class="row g-2">
+            <div class="col-md-4">
+              <input v-model="filters.product_name" type="text" class="form-control form-control-sm" placeholder="Search by name..." id="filter-name" @input="debounceSearch">
+            </div>
+            <div class="col-md-3">
+              <input v-model="filters.start_date" type="date" class="form-control form-control-sm" id="filter-start" @change="handleFilter">
+            </div>
+            <div class="col-md-3">
+              <input v-model="filters.end_date" type="date" class="form-control form-control-sm" id="filter-end" @change="handleFilter">
+            </div>
+            <div class="col-md-2">
+              <select v-model="filters.size" class="form-select form-select-sm" @change="handleFilter" id="filter-size">
+                <option :value="10">10 Rows</option>
+                <option :value="25">25 Rows</option>
+              </select>
+            </div>
+          </div>
         </div>
   
         <div class="card shadow-sm">
@@ -84,11 +96,7 @@
             <table class="table table-sm table-striped align-middle mb-0" id="table-history">
               <thead class="table-dark">
                 <tr>
-                  <th>Date & Time</th>
-                  <th>Product</th>
-                  <th>Type</th>
-                  <th>Quantity</th>
-                  <th>Reference</th>
+                  <th>Date & Time</th><th>Product</th><th>Type</th><th>Quantity</th><th>Reference</th>
                 </tr>
               </thead>
               <tbody>
@@ -96,20 +104,33 @@
                   <td class="small text-muted">{{ new Date(tx.created_at).toLocaleString() }}</td>
                   <td class="fw-bold">{{ tx.product_name || 'Product #' + tx.product_id }}</td>
                   <td>
-                    <span :class="['badge', tx.transaction_type === 'IN' ? 'bg-success' : 'bg-warning text-dark']">
-                      {{ tx.transaction_type }}
-                    </span>
+                    <span :class="['badge', tx.transaction_type === 'IN' ? 'bg-success' : 'bg-warning text-dark']">{{ tx.transaction_type }}</span>
                   </td>
                   <td :class="tx.transaction_type === 'IN' ? 'text-success' : 'text-danger'">
                     {{ tx.transaction_type === 'IN' ? '+' : '-' }}{{ tx.quantity }}
                   </td>
                   <td class="text-muted small">{{ tx.reference }}</td>
                 </tr>
-                <tr v-if="!inventory.transactions || inventory.transactions.length === 0">
-                  <td colspan="5" class="text-center py-4 text-muted">No transactions found.</td>
+                <tr v-if="inventory.transactions.length === 0">
+                  <td colspan="5" class="text-center py-4 text-muted">No transactions found matching your filters.</td>
                 </tr>
               </tbody>
             </table>
+          </div>
+          
+          <div class="card-footer bg-white d-flex justify-content-between align-items-center" v-if="inventory.pagination.pages > 1">
+            <small class="text-muted">Total: {{ inventory.pagination.total }} records</small>
+            <nav>
+              <ul class="pagination pagination-sm mb-0">
+                <li class="page-item" :class="{ disabled: inventory.pagination.currentPage === 1 }">
+                  <a class="page-link" href="#" @click.prevent="changePage(inventory.pagination.currentPage - 1)">Previous</a>
+                </li>
+                <li class="page-item active"><span class="page-link">{{ inventory.pagination.currentPage }}</span></li>
+                <li class="page-item" :class="{ disabled: inventory.pagination.currentPage === inventory.pagination.pages }">
+                  <a class="page-link" href="#" @click.prevent="changePage(inventory.pagination.currentPage + 1)">Next</a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
       </div>
@@ -119,29 +140,29 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="modal-title">Update Stock: {{ selectedProduct?.name }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btn-close-modal"></button>
+            <h5 class="modal-title">Update Stock: {{ selectedProduct?.name }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
             <form @submit.prevent="submitTransaction">
               <div class="mb-3">
                 <label class="form-label">Transaction Type</label>
-                <select class="form-select" v-model="form.transaction_type" id="select-type" required>
+                <select class="form-select" v-model="form.transaction_type" required>
                   <option value="IN">Stock IN (Restock)</option>
                   <option value="OUT">Stock OUT (Sale)</option>
                 </select>
               </div>
               <div class="mb-3">
                 <label class="form-label">Quantity</label>
-                <input type="number" class="form-control" v-model.number="form.quantity" id="input-quantity" min="1" required>
+                <input type="number" class="form-control" v-model.number="form.quantity" min="1" required>
               </div>
               <div class="mb-3">
                 <label class="form-label">Reference Note</label>
-                <input type="text" class="form-control" v-model="form.reference" id="input-reference" placeholder="e.g. Monthly restock">
+                <input type="text" class="form-control" v-model="form.reference" placeholder="e.g. Monthly restock">
               </div>
               <div class="modal-footer px-0 pb-0">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btn-cancel-tx">Cancel</button>
-                <button type="submit" class="btn btn-primary" id="btn-submit-tx">Submit Transaction</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Submit Transaction</button>
               </div>
             </form>
           </div>
@@ -151,7 +172,7 @@
   </template>
   
   <script setup>
-  import * as bootstrap from 'bootstrap'; // Crucial for modal control
+  import * as bootstrap from 'bootstrap';
   import { onMounted, reactive, ref } from 'vue';
   import { useInventoryStore } from '@/stores/inventory';
   import { useAuthStore } from '@/stores/auth';
@@ -164,17 +185,66 @@
   
   const selectedProduct = ref(null);
   const successMessage = ref('');
+  const timer = ref(null);
+  
+  const filters = reactive({
+    product_name: '',
+    start_date: '',
+    end_date: '',
+    page: 1,
+    size: 10
+  });
+  
   const form = reactive({
     transaction_type: 'IN',
     quantity: 1,
     reference: ''
   });
   
-  // Cleaned up onMounted
   onMounted(async () => {
-    await inventory.fetchProducts();
-    await inventory.fetchTransactions();
-  });
+  try {
+    // We load both simultaneously to save time
+    await Promise.all([
+      inventory.fetchProducts(),
+      inventory.fetchTransactions(filters)
+    ]);
+    console.log("Data loaded successfully:", inventory.products.length, "products found.");
+  } catch (err) {
+    console.error("Initial load failed:", err);
+  }
+});
+  
+  // Filtering Logic
+  const handleFilter = async () => {
+    await inventory.fetchTransactions({
+      product_name: filters.product_name || undefined,
+      start_date: filters.start_date || undefined,
+      end_date: filters.end_date || undefined,
+      page: filters.page,
+      size: filters.size
+    });
+  };
+  
+  const debounceSearch = () => {
+    if (timer.value) clearTimeout(timer.value);
+    timer.value = setTimeout(() => {
+      filters.page = 1;
+      handleFilter();
+    }, 500);
+  };
+  
+  const changePage = (newPage) => {
+    filters.page = newPage;
+    handleFilter();
+  };
+  
+  const resetFilters = () => {
+    filters.product_name = '';
+    filters.start_date = '';
+    filters.end_date = '';
+    filters.page = 1;
+    handleFilter();
+  };
   
   const prepareTransaction = (product) => {
     selectedProduct.value = product;
@@ -189,31 +259,23 @@
         reference: form.reference || "Manual Adjustment"
       };
   
-      // API calls
       await api.post('/transactions/', payload);
       await inventory.fetchProducts();
-      await inventory.fetchTransactions();
+      await handleFilter(); // Refresh with current filters
   
-      // Show success UI
       successMessage.value = `Successfully updated stock for ${selectedProduct.value.name}!`;
       setTimeout(() => { successMessage.value = ''; }, 3000);
   
-      // Bootstrap Modal Cleanup
       const modalElement = document.getElementById('transactionModal');
       if (modalElement) {
         const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
         modalInstance.hide();
-        
-        // Safety net to remove stuck backdrops
         document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
         document.body.classList.remove('modal-open');
-        document.body.style.overflow = '';
       }
   
-      // Reset Form
       form.quantity = 1;
       form.reference = '';
-      
     } catch (err) {
       console.error("Submission Error:", err);
       alert(`Error: ${err.response?.data?.detail || "Transaction failed"}`);
