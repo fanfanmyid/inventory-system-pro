@@ -25,3 +25,9 @@ class SaleItem(Base):
     
     sale = relationship("Sale", back_populates="items")
     product = relationship("Product")
+    @property
+    def product_name(self):
+        """QA Logic: Safely retrieve the name from the joined product object"""
+        if self.product:
+            return self.product.name
+        return "Unknown Product"

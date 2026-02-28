@@ -19,6 +19,7 @@ class TransactionCreate(TransactionBase):
 class TransactionResponse(TransactionBase):
     id: int
     created_at: datetime
+    product_name: Optional[str] = None
 
     class Config:
         from_attributes = True

@@ -11,6 +11,7 @@ ${QTY_SOLD}
 
 *** Test Cases ***
 Scenario: User performs a checkout with dynamic stock verification
+    [Tags]    feature    regression    sales
     Given I am a logged in user
     And I have a product with ID "1"
     When I checkout "2" units of that product
@@ -35,14 +36,20 @@ I have a product with ID "${id}"
     Set Suite Variable    ${START_STOCK}    ${current_actual_stock}
 
 I checkout "${quantity}" units of that product
-    ${item}=    Create Dictionary    product_id=${PRODUCT_ID}    quantity=${quantity}
+    ${qty}=    Convert To Integer    ${quantity}
+    ${unit_price}=    Set Variable    1000000
+    ${item}=    Create Dictionary    product_id=${PRODUCT_ID}    quantity=${qty}    unit_price=${unit_price}
     ${items}=    Create List    ${item}
-    ${payload}=    Create Dictionary    items=${items}
+    ${total_price}=    Evaluate    ${qty} * ${unit_price}
+    ${payload}=    Create Dictionary    items=${items}    total_price=${total_price}
+    ${random}=    Evaluate    __import__('random').randint(10000,99999)
+    ${invoice_number}=    Set Variable    INV-${random}
+    Set To Dictionary    ${payload}    invoice_number=${invoice_number}
     
     ${resp}=    POST On Session    inventory    /sales/    json=${payload}    headers=${HEADERS}
     
     # Store the quantity sold to calculate the math later
-    Set Suite Variable    ${QTY_SOLD}    ${quantity}
+    Set Suite Variable    ${QTY_SOLD}    ${qty}
     Set Suite Variable    ${LAST_RESP}    ${resp}
 
 the checkout should be successful
