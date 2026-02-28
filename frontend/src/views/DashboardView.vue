@@ -147,22 +147,22 @@
             <form @submit.prevent="submitTransaction">
               <div class="mb-3">
                 <label class="form-label">Transaction Type</label>
-                <select class="form-select" v-model="form.transaction_type" required>
+                <select class="form-select" v-model="form.transaction_type" required id="tx-type-select">
                   <option value="IN">Stock IN (Restock)</option>
                   <option value="OUT">Stock OUT (Sale)</option>
                 </select>
               </div>
               <div class="mb-3">
                 <label class="form-label">Quantity</label>
-                <input type="number" class="form-control" v-model.number="form.quantity" min="1" required>
+                <input type="number" class="form-control" v-model.number="form.quantity" min="1" required id="tx-quantity-input">
               </div>
               <div class="mb-3">
                 <label class="form-label">Reference Note</label>
-                <input type="text" class="form-control" v-model="form.reference" placeholder="e.g. Monthly restock">
+                <input type="text" class="form-control" v-model="form.reference" placeholder="e.g. Monthly restock" id="tx-reference-input">
               </div>
               <div class="modal-footer px-0 pb-0">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary">Submit Transaction</button>
+                <button type="submit" class="btn btn-primary" id="tx-submit-btn">Submit Transaction</button>
               </div>
             </form>
           </div>

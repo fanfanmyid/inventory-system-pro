@@ -25,6 +25,14 @@
           <i class="bi bi-cart-plus me-2"></i>New Sale
         </button>
       </div>
+        <div v-if="saleSuccessMessage" class="alert alert-success d-flex align-items-center gap-2" id="msg-sale-success">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>{{ saleSuccessMessage }}</span>
+        </div>
+        <div v-if="saleErrorMessage" class="alert alert-danger d-flex align-items-center gap-2" id="msg-sale-error">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>{{ saleErrorMessage }}</span>
+        </div>
   
       <div class="card shadow-sm border-0 mb-4 p-3 bg-light">
         <div class="row g-2">
@@ -111,6 +119,64 @@
       </div>
   
       </div>
+      <div class="modal fade" id="newSaleModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Record New Sale</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form @submit.prevent="submitSale">
+                <div class="mb-3">
+                  <label class="form-label" for="sale-invoice-input">Invoice Number</label>
+                  <input type="text" class="form-control" id="sale-invoice-input" v-model="saleForm.invoice_number" readonly>
+                </div>
+
+                <div v-for="(item, index) in saleForm.items" :key="`sale-item-${index}`" class="border rounded p-3 mb-3" :id="`sale-item-${index}`">
+                  <div class="row g-2 align-items-end">
+                    <div class="col-md-5">
+                      <label class="form-label" :for="`sale-product-select-${index}`">Product</label>
+                      <select class="form-select" :id="`sale-product-select-${index}`" v-model.number="item.product_id" required>
+                        <option :value="null" disabled>Select product</option>
+                        <option v-for="product in inventoryStore.products" :key="product.id" :value="product.id">
+                          {{ product.name }} (Stock: {{ product.stock }})
+                        </option>
+                      </select>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label" :for="`sale-qty-input-${index}`">Quantity</label>
+                      <input type="number" class="form-control" :id="`sale-qty-input-${index}`" v-model.number="item.quantity" min="1" required>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label" :for="`sale-price-input-${index}`">Unit Price</label>
+                      <input type="number" class="form-control" :id="`sale-price-input-${index}`" v-model.number="item.unit_price" min="0" required>
+                    </div>
+                    <div class="col-md-1 text-end">
+                      <button type="button" class="btn btn-outline-danger btn-sm" :id="`btn-remove-sale-item-${index}`" @click="removeSaleItem(index)" v-if="saleForm.items.length > 1">
+                        <i class="bi bi-x"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <button type="button" class="btn btn-outline-primary btn-sm" id="btn-add-sale-item" @click="addSaleItem">
+                  <i class="bi bi-plus-lg me-1"></i>Add Item
+                </button>
+
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <strong>Total: Rp {{ totalAmount.toLocaleString() }}</strong>
+                </div>
+
+                <div class="modal-footer px-0 pb-0 pt-4">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button type="submit" class="btn btn-primary" id="btn-submit-sale">Save Sale</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
   </template>
   
   <script setup>
@@ -129,6 +195,8 @@
   
   const expandedRows = ref([]);
   const timer = ref(null);
+  const saleSuccessMessage = ref('');
+  const saleErrorMessage = ref('');
   
   // Updated reactive filters including invoice_number
   const filters = reactive({
@@ -202,23 +270,44 @@
   
   const submitSale = async () => {
     try {
+      saleErrorMessage.value = '';
+      const sanitizedItems = saleForm.items
+        .filter(item => item.product_id)
+        .map(item => ({
+          product_id: item.product_id,
+          quantity: Number(item.quantity),
+          unit_price: Number(item.unit_price)
+        }));
+
+      if (!sanitizedItems.length) {
+        saleErrorMessage.value = 'Please add at least one valid item.';
+        return;
+      }
+
       const payload = {
         invoice_number: saleForm.invoice_number,
-        items: saleForm.items,
+        items: sanitizedItems,
         total_price: totalAmount.value
       };
       await api.post('/sales/', payload);
       await salesStore.fetchSales(filters);
       await inventoryStore.fetchProducts();
-  
-      const modal = bootstrap.Modal.getInstance(document.getElementById('newSaleModal'));
-      modal.hide();
-  
+
+      const modalElement = document.getElementById('newSaleModal');
+      if (modalElement) {
+        const existingModal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+        existingModal.hide();
+      }
+
+      saleSuccessMessage.value = 'Sale recorded successfully!';
+      setTimeout(() => (saleSuccessMessage.value = ''), 3000);
+
       generateInvoiceNumber();
-      saleForm.items = [{ product_id: null, quantity: 1, unit_price: 0 }];
-      alert("Sale recorded successfully!");
+      saleForm.items.splice(0, saleForm.items.length, { product_id: null, quantity: 1, unit_price: 0 });
     } catch (err) {
-      alert("Error: " + (err.response?.data?.detail || "Transaction failed"));
+      console.error('Sale submission error:', err);
+      saleErrorMessage.value = err.response?.data?.detail || 'Transaction failed';
+      setTimeout(() => (saleErrorMessage.value = ''), 4000);
     }
   };
   

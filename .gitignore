@@ -6,3 +6,4 @@ env/
 *log.html
 *.pyc
 __pycache__/
+*selenium-screenshot-*.png
