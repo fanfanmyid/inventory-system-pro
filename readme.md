@@ -5,17 +5,39 @@ Inventory System Pro is a full-stack inventory & sales management platform built
 ---
 
 ## Table of Contents
-1. [Architecture Overview](#architecture-overview)
-2. [Project Structure](#project-structure)
-3. [Prerequisites](#prerequisites)
-4. [Getting Started](#getting-started)
-5. [Environment Configuration](#environment-configuration)
-6. [Running the Stack](#running-the-stack)
-7. [Automation Testing](#automation-testing)
-8. [Useful Commands](#useful-commands)
-9. [Contributing](#contributing)
+1. [Highlights](#highlights)
+2. [Tech Stack](#tech-stack)
+3. [Architecture Overview](#architecture-overview)
+4. [Project Structure](#project-structure)
+5. [Prerequisites](#prerequisites)
+6. [Getting Started](#getting-started)
+7. [Environment Configuration](#environment-configuration)
+8. [Running the Stack](#running-the-stack)
+9. [Automation Testing](#automation-testing)
+10. [Useful Commands](#useful-commands)
+11. [Troubleshooting](#troubleshooting)
+12. [Portfolio Checklist](#portfolio-checklist)
+13. [Contributing](#contributing)
 
 ---
+
+## Highlights
+
+- **Production-like workflows**: Containerized FastAPI, PostgreSQL, and Vite/Nginx mirror a realistic deployment topology.
+- **Automated confidence**: Robot Framework covers REST flows plus Selenium UI journeys, enabling repeatable demos.
+- **Service layering**: CRUD, services, and schemas clearly separate persistence, business logic, and IO.
+- **Batteries included**: Seed scripts, tagged test suites, and `.env` templates shrink onboarding time to minutes.
+- **Portfolio ready**: Clean documentation, deterministic commands, and automated testing make this project easy to showcase.
+
+## Tech Stack
+
+| Layer | Technologies |
+| --- | --- |
+| **API** | FastAPI, SQLAlchemy, Pydantic, Alembic |
+| **Data** | PostgreSQL 15 (Alpine), SQL migrations |
+| **Frontend** | Vue 3, Vite, Pinia, Vue Router, Bootstrap styles |
+| **Automation** | Robot Framework, RequestsLibrary, SeleniumLibrary, ChromeDriver |
+| **DevOps** | Docker Compose, Uvicorn, Nginx, seed scripts |
 
 ## Architecture Overview
 
@@ -163,6 +185,8 @@ Included suites:
 
 All suites default to `http://localhost:5173`, so ensure Docker stack or Vite dev server is running.
 
+Robot produces XML/HTML reports under `tests/results/robot`. Attach the HTML log when sharing demo evidence.
+
 ---
 
 ## Useful Commands
@@ -175,6 +199,26 @@ All suites default to `http://localhost:5173`, so ensure Docker stack or Vite de
 | Run Alembic migrations | `alembic upgrade head` |
 | Run backend tests (tagged) | `./env/bin/robot -i <tag> tests/robot/suites/backend` |
 | Run UI tests | `./env/bin/robot tests/robot/suites/frontend` |
+
+---
+
+## Troubleshooting
+
+- **Auth errors on startup**: Confirm `POSTGRES_PASSWORD` matches across `backend/.env` and root `.env`, then rebuild with `docker-compose up --build`.
+- **Database refuses connections**: Run `docker-compose ps` to ensure the `db` health check passes. Use `docker-compose logs db` for detail.
+- **Frontend port already in use**: Adjust Vite dev server via `npm run dev -- --host --port 5174` or stop the conflicting process.
+- **Robot Selenium failures**: Verify Chrome/Chromedriver versions align and export `CHROMEDRIVER_PATH` if using a custom binary.
+- **Stale migrations**: Apply `alembic upgrade head` inside the backend container before seeding data.
+
+---
+
+## Portfolio Checklist
+
+- Capture short clips or animated GIFs of the Dashboard and Sales flows while tests pass in the terminal.
+- Mention dual-layer automation (API + UI) and link to the Robot reports in your portfolio site or resume.
+- Highlight the Docker-first workflow and the fact that onboarding requires only `docker-compose up --build`.
+- Reference this README’s structure in your write-up to show attention to documentation quality.
+- Optionally deploy the stack on Fly.io, Render, or Railway and include the public URL for live demos.
 
 ---
 
