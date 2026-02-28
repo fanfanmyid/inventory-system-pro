@@ -10,7 +10,7 @@ ${LAST_RESP}
 
 *** Test Cases ***
 Scenario: Perform Stock OUT (Reduction)
-    [Tags]    regression    stock_out    transaction
+    [Tags]    regression    stock_out    transaction    feature
     Given I am a logged in user
     And I have a product with ID "1"
     When I perform a "OUT" transaction for "5" units
@@ -18,7 +18,7 @@ Scenario: Perform Stock OUT (Reduction)
     And the product stock should be "decreased" by "5"
 
 Scenario: Perform Stock IN (Restocking)
-    [Tags]    regression    stock_in    transaction
+    [Tags]    regression    stock_in    transaction    feature
     Given I am a logged in user
     And I have a product with ID "1"
     When I perform a "IN" transaction for "10" units

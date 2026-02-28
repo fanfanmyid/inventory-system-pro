@@ -1,3 +1,8 @@
 .env
 variables.py
 env/
+*report.html
+*output.xml
+*log.html
+*.pyc
+__pycache__/
