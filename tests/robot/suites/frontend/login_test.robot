@@ -5,7 +5,8 @@ Test Setup       Open Browser To Login Page
 Test Teardown    Close Browser
 
 *** Variables ***
-${URL}           http://localhost:5173
+${URL}           http://localhost
+${LOGIN_URL}     ${URL}/login
 ${BROWSER}       chrome
 ${VALID_USER}    fanfanmyid
 ${VALID_PASS}    Sample123!
@@ -33,6 +34,6 @@ Scenario: Failed Login with Invalid Credentials
 
 *** Keywords ***
 Open Browser To Login Page
-    Open Browser    ${URL}    ${BROWSER}
+    Open Browser    ${LOGIN_URL}    ${BROWSER}
     Maximize Browser Window
     Set Selenium Speed    0.5 seconds  # Slows down for demonstration

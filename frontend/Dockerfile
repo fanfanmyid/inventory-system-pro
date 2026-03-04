@@ -1,6 +1,11 @@
 # Stage 1: Build the Vue application
 FROM node:20-alpine as build-stage
 WORKDIR /app
+
+# Allow compose builds to override the API base path for production bundles
+ARG VITE_API_URL=/api/v1
+ENV VITE_API_URL=${VITE_API_URL}
+
 COPY package*.json ./
 RUN npm install
 COPY . .

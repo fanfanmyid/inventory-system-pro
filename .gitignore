@@ -1,4 +1,6 @@
 .env
+tests/performance/k6/.env
+tests/performance/k6/reports/
 variables.py
 env/
 *report.html
