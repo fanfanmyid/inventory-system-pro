@@ -5,17 +5,42 @@ Inventory System Pro is a full-stack inventory & sales management platform built
 ---
 
 ## Table of Contents
-1. [Architecture Overview](#architecture-overview)
-2. [Project Structure](#project-structure)
-3. [Prerequisites](#prerequisites)
-4. [Getting Started](#getting-started)
-5. [Environment Configuration](#environment-configuration)
-6. [Running the Stack](#running-the-stack)
-7. [Automation Testing](#automation-testing)
-8. [Useful Commands](#useful-commands)
-9. [Contributing](#contributing)
+1. [Highlights](#highlights)
+2. [Tech Stack](#tech-stack)
+3. [Architecture Overview](#architecture-overview)
+4. [Project Structure](#project-structure)
+5. [Prerequisites](#prerequisites)
+6. [Getting Started](#getting-started)
+7. [Environment Configuration](#environment-configuration)
+8. [Running the Stack](#running-the-stack)
+9. [Router Publishing](#router-publishing)
+10. [Landing Page](#landing-page)
+11. [Automation Testing](#automation-testing)
+12. [Performance Testing (k6)](#performance-testing-k6)
+13. [Useful Commands](#useful-commands)
+14. [Troubleshooting](#troubleshooting)
+15. [Portfolio Checklist](#portfolio-checklist)
+16. [Contributing](#contributing)
 
 ---
+
+## Highlights
+
+- **Production-like workflows**: Containerized FastAPI, PostgreSQL, and Vite/Nginx mirror a realistic deployment topology.
+- **Automated confidence**: Robot Framework covers REST flows plus Selenium UI journeys, enabling repeatable demos.
+- **Service layering**: CRUD, services, and schemas clearly separate persistence, business logic, and IO.
+- **Batteries included**: Seed scripts, tagged test suites, and `.env` templates shrink onboarding time to minutes.
+- **Portfolio ready**: Clean documentation, deterministic commands, and automated testing make this project easy to showcase.
+
+## Tech Stack
+
+| Layer | Technologies |
+| --- | --- |
+| **API** | FastAPI, SQLAlchemy, Pydantic, Alembic |
+| **Data** | PostgreSQL 15 (Alpine), SQL migrations |
+| **Frontend** | Vue 3, Vite, Pinia, Vue Router, Bootstrap styles |
+| **Automation** | Robot Framework, RequestsLibrary, SeleniumLibrary, ChromeDriver |
+| **DevOps** | Docker Compose, Uvicorn, Nginx, seed scripts |
 
 ## Architecture Overview
 
@@ -41,9 +66,11 @@ inventory-system-pro/
 │   ├── package.json
 │   └── Dockerfile
 ├── tests/
-│   └── robot/
-│       ├── resources/        # Shared keywords & locators
-│       └── suites/           # Backend & frontend Robot suites
+│   ├── robot/
+│   │   ├── resources/        # Shared keywords & locators
+│   │   └── suites/           # Backend & frontend Robot suites
+│   └── performance/
+│       └── k6/               # Smoke/load/write-heavy performance scripts
 ├── docker-compose.yml        # Orchestrates db/backend/frontend
 ├── readme.md
 └── env/                     # Local Python virtual environment (optional)
@@ -110,9 +137,11 @@ docker-compose up --build
 ```
 
 Services exposed:
-- Frontend: http://localhost:5173
-- Backend API & docs: http://localhost:8000/docs
+- Gateway (Nginx): http://localhost (port 80) routes `/` to the Vue build and `/api` to FastAPI.
+- Backend API & docs (direct access for debugging): http://localhost:8000/docs
 - PostgreSQL: localhost:5432 (service name `db` inside network)
+
+The gateway configuration lives in [deploy/nginx/default.conf](deploy/nginx/default.conf); tweak the server block (TLS, caching, headers) before exposing the stack in production.
 
 ### Option 2: Local Development
 
@@ -128,6 +157,28 @@ Services exposed:
 	npm run dev -- --host
 	```
 3. Ensure PostgreSQL is running locally or via Docker and matches `DATABASE_URL`.
+
+---
+
+## Router Publishing
+
+1. Boot the stack with `docker-compose up --build` and confirm `http://localhost` responds through the new Nginx gateway.
+2. In your router, forward external TCP 80 to the Docker host’s port 80. Reserve the host’s LAN IP so the rule remains stable.
+3. (Optional) Forward TCP 443 and extend [deploy/nginx/default.conf](deploy/nginx/default.conf) with an SSL-enabled server block if you have certificates. Mount them via an extra volume on the `gateway` service.
+4. Point DNS (or a DDNS hostname) at your public IP. Without DNS, you can still reach the stack via the raw IP.
+5. Restart the proxy with `docker-compose restart gateway` whenever you tweak the config.
+
+With this setup only Nginx is internet-facing; FastAPI, Vue, and PostgreSQL stay on the private bridge network while benefiting from the shared `/api` routing.
+
+---
+
+## Landing Page
+
+The root route (`/`) now serves a public landing page that introduces the project and links users to `/login`.
+
+- **Public preview**: Feature overview cards and stack highlights for portfolio/demo audiences.
+- **Authenticated app routes**: `/dashboard` and `/sales` are guarded and require a valid token.
+- **Login route**: `/login` is the dedicated auth entrypoint used by both users and UI automation.
 
 ---
 
@@ -161,7 +212,61 @@ Included suites:
 - `dashboard_test.robot`: inventory table, transaction filters, stock modal, logout.
 - `sales_test.robot`: sales history visibility & “New Sale” modal.
 
-All suites default to `http://localhost:5173`, so ensure Docker stack or Vite dev server is running.
+All suites default to `http://localhost` (the Nginx gateway), so ensure the Docker stack is running.
+
+Robot produces XML/HTML reports under `tests/results/robot`. Attach the HTML log when sharing demo evidence.
+
+---
+
+## Performance Testing (k6)
+
+The repository includes Docker-ready k6 scripts in `tests/performance/k6`:
+
+- `smoke.js`: lightweight authenticated health/performance check.
+- `load.js`: ramping virtual users for read-heavy traffic (`products`, `transactions`, `sales`).
+- `write-heavy.js`: creates products, transactions, and sales under concurrent iterations.
+
+### Configure secrets (required)
+
+Create a local secret file and keep it out of git:
+
+```bash
+cp tests/performance/k6/.env.example tests/performance/k6/.env
+```
+
+Set the following values in `tests/performance/k6/.env`:
+
+- `API_BASE_URL`
+- `K6_USERNAME`
+- `K6_PASSWORD`
+
+`tests/performance/k6/.env` is git-ignored by default.
+
+### Run with Docker Compose (recommended)
+
+```bash
+# ensure app stack is up first
+docker-compose up -d db backend frontend gateway
+
+# smoke profile
+docker-compose --profile performance run --rm k6 run smoke.js
+
+# load profile
+docker-compose --profile performance run --rm k6 run load.js
+
+# write-heavy profile
+docker-compose --profile performance run --rm k6 run write-heavy.js
+```
+
+Export JSON summaries to report artifacts:
+
+```bash
+docker-compose --profile performance run --rm k6 run --summary-export=/scripts/reports/smoke-summary.json smoke.js
+docker-compose --profile performance run --rm k6 run --summary-export=/scripts/reports/load-summary.json load.js
+docker-compose --profile performance run --rm k6 run --summary-export=/scripts/reports/write-heavy-summary.json write-heavy.js
+```
+
+Report outputs are generated under `tests/performance/k6/reports`.
 
 ---
 
@@ -175,6 +280,29 @@ All suites default to `http://localhost:5173`, so ensure Docker stack or Vite de
 | Run Alembic migrations | `alembic upgrade head` |
 | Run backend tests (tagged) | `./env/bin/robot -i <tag> tests/robot/suites/backend` |
 | Run UI tests | `./env/bin/robot tests/robot/suites/frontend` |
+| Run k6 smoke test (Docker) | `docker-compose --profile performance run --rm k6 run smoke.js` |
+| Run k6 load test (Docker) | `docker-compose --profile performance run --rm k6 run load.js` |
+| Run k6 write-heavy test (Docker) | `docker-compose --profile performance run --rm k6 run write-heavy.js` |
+
+---
+
+## Troubleshooting
+
+- **Auth errors on startup**: Confirm `POSTGRES_PASSWORD` matches across `backend/.env` and root `.env`, then rebuild with `docker-compose up --build`.
+- **Database refuses connections**: Run `docker-compose ps` to ensure the `db` health check passes. Use `docker-compose logs db` for detail.
+- **Frontend port already in use**: Adjust Vite dev server via `npm run dev -- --host --port 5174` or stop the conflicting process.
+- **Robot Selenium failures**: Verify Chrome/Chromedriver versions align and export `CHROMEDRIVER_PATH` if using a custom binary.
+- **Stale migrations**: Apply `alembic upgrade head` inside the backend container before seeding data.
+
+---
+
+## Portfolio Checklist
+
+- Capture short clips or animated GIFs of the Dashboard and Sales flows while tests pass in the terminal.
+- Mention dual-layer automation (API + UI) and link to the Robot reports in your portfolio site or resume.
+- Highlight the Docker-first workflow and the fact that onboarding requires only `docker-compose up --build`.
+- Reference this README’s structure in your write-up to show attention to documentation quality.
+- Optionally deploy the stack on Fly.io, Render, or Railway and include the public URL for live demos.
 
 ---
 

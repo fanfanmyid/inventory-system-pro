@@ -6,7 +6,8 @@ Suite Teardown   Close Browser
 Test Setup       Ensure Dashboard Session
 
 *** Variables ***
-${URL}           http://localhost:5173
+${URL}           http://localhost
+${LOGIN_URL}     ${URL}/login
 ${BROWSER}       chrome
 ${VALID_USER}    fanfanmyid
 ${VALID_PASS}    Sample123!
@@ -56,7 +57,7 @@ Ensure Dashboard Session
     END
 
 Login Through UI
-    Go To    ${URL}
+    Go To    ${LOGIN_URL}
     Wait Until Element Is Visible    ${LOGIN_USER_INPUT}    10s
     Input Text    ${LOGIN_USER_INPUT}    ${VALID_USER}
     Input Text    ${LOGIN_PASS_INPUT}    ${VALID_PASS}

@@ -319,6 +319,6 @@
   
   const logout = () => {
     auth.logout();
-    router.push('/');
+    router.push('/login');
   };
   </script>

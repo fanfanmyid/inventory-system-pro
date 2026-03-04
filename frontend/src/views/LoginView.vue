@@ -56,7 +56,7 @@
   </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
 
@@ -68,6 +68,12 @@ const errorMessage = ref('');
 const form = reactive({
   username: '',
   password: ''
+});
+
+onMounted(() => {
+  if (auth.isAuthenticated) {
+    router.push('/dashboard');
+  }
 });
 
 const handleSubmit = async () => {
