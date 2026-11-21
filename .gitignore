@@ -9,3 +9,5 @@ env/
 *.pyc
 __pycache__/
 *selenium-screenshot-*.png
+.DS_Store
+tests/results/

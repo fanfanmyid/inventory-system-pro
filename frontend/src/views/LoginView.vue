@@ -84,7 +84,7 @@ const handleSubmit = async () => {
     if (success) {
       router.push('/dashboard'); // Redirect after successful login
     }
-  } catch (err) {
+  } catch {
     errorMessage.value = 'Invalid username or password. Please try again.';
   } finally {
     loading.value = false;

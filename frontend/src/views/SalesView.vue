@@ -259,11 +259,6 @@
     saleForm.items.splice(index, 1);
   };
   
-  const updatePrice = (index) => {
-    const product = inventoryStore.products.find(p => p.id === saleForm.items[index].product_id);
-    // Auto-set unit price if you have price data in your product model
-  };
-  
   const totalAmount = computed(() => {
     return saleForm.items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
   });
